@@ -15,7 +15,7 @@ def test_exaple1(driver):
     driver.get('http://localhost/litecart/admin')
     username = driver.find_element(By.NAME, "username").send_keys('test')
     password = driver.find_element(By.NAME, "password").send_keys('test')
-    login = driver.find_element(By.NAME, "Login").click()
-    sleep(5)
+    login = driver.find_element(By.NAME, "login")
+    login.click()
     driver.quit()
 
