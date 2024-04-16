@@ -2,11 +2,13 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
+
 @pytest.fixture
 def driver():
     driver = webdriver.Chrome()
     driver.get("http://localhost/litecart/")
     return driver
+
 
 def test(driver):
     products = driver.find_elements(By.CSS_SELECTOR, ".product")
@@ -20,4 +22,3 @@ def test(driver):
             print("У товара нет стикера или их больше 1")
 
     driver.quit()
-
