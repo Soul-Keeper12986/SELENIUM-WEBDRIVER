@@ -3,6 +3,7 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
+
 @pytest.fixture
 def driver():
     driver = webdriver.Chrome()
@@ -12,29 +13,39 @@ def driver():
 
 def test_page_and_product(driver):
     # Находим первый товар в блоке Campaigns
+    sale_price = driver.find_element(By.CSS_SELECTOR,
+                                     "#box-campaigns > div > ul > li > a.link > div.price-wrapper > strong")
+    regular_price = driver.find_element(By.CSS_SELECTOR,
+                                        "#box-campaigns > div > ul > li > a.link > div.price-wrapper > s")
     product_name = driver.find_element(By.CSS_SELECTOR, "#box-campaigns > div > ul > li > a.link > div.name").text
-    regular_price = driver.find_element(By.CSS_SELECTOR, "#box-campaigns > div > ul > li > a.link > div.price-wrapper > s").text
-    sale_price = driver.find_element(By.CSS_SELECTOR, "#box-campaigns > div > ul > li > a.link > div.price-wrapper > strong").text
 
-    regular_price_style = driver.find_element(By.CSS_SELECTOR, "#box-campaigns > div > ul > li > a.link > div.price-wrapper > s").value_of_css_property("color")
-    regular_price_lined = driver.find_element(By.CSS_SELECTOR, "#box-campaigns > div > ul > li > a.link > div.price-wrapper > s").value_of_css_property('text-decoration-line')
-    sale_price_style = driver.find_element(By.CSS_SELECTOR, "#box-campaigns > div > ul > li > a.link > div.price-wrapper > strong").value_of_css_property("color")
-    regular_price_size = driver.find_element(By.CSS_SELECTOR, "#box-campaigns > div > ul > li > a.link > div.price-wrapper > s").value_of_css_property("font-size")
-    sale_price_size = driver.find_element(By.CSS_SELECTOR, "#box-campaigns > div > ul > li > a.link > div.price-wrapper > strong").value_of_css_property("font-size")
-    sale_prise_strong = driver.find_element(By.CSS_SELECTOR,"#box-campaigns > div > ul > li > a.link > div.price-wrapper > strong").value_of_css_property("font-weight")
+    regular_price_text = regular_price.text
+    sale_price_text = sale_price.text
+    regular_price_style = regular_price.value_of_css_property("color")
+    regular_price_lined = regular_price.value_of_css_property('text-decoration-line')
+    sale_price_style = sale_price.value_of_css_property("color")
+    regular_price_size = regular_price.value_of_css_property("font-size")
+    sale_price_size = sale_price.value_of_css_property("font-size")
+    sale_prise_strong = sale_price.value_of_css_property("font-weight")
 
     # Кликаем на товар для перехода на страницу товара
     driver.find_element(By.CSS_SELECTOR, "#box-campaigns > div > ul > li > a.link").click()
-    product_name_product = driver.find_element(By.CSS_SELECTOR, "h1").text
-    regular_price_product = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/s").text
-    regular_price_product_lined = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/s").value_of_css_property('text-decoration-line')
-    sale_price_product = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/strong").text
-    sale_price_style_product = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/strong").value_of_css_property("color")
-    regular_price_style_product = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/s").value_of_css_property("color")
-    regular_price_size_product = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/s").value_of_css_property("font-size")
-    sale_price_size_product = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/strong").value_of_css_property("font-size")
-    sale_prise_strong_product = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/strong").value_of_css_property("font-weight")
 
+    product_name_product = driver.find_element(By.CSS_SELECTOR, "h1").text
+    regular_price_product = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/s")
+    sale_price_product = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/strong")
+
+    regular_price_text_product = regular_price_product.text
+    regular_price_product_lined = regular_price_product.value_of_css_property('text-decoration-line')
+    sale_price_text_product = sale_price_product.text
+    sale_price_style_product = sale_price_product.value_of_css_property("color")
+    regular_price_style_product = regular_price_product.value_of_css_property("color")
+    regular_price_size_product = regular_price_product.value_of_css_property("font-size")
+    sale_price_size_product = sale_price_product.value_of_css_property("font-size")
+    sale_prise_strong_product = sale_price_product.value_of_css_property("font-weight")
+
+    print(regular_price_style_product)
+    a = driver.find_element(By.XPATH, "//*[@id='box-product']/div[2]/div[2]/div[2]/s")
 
     try:
         assert product_name == product_name_product
@@ -42,12 +53,12 @@ def test_page_and_product(driver):
         print("AssertionError: Имена не совпадают")
 
     try:
-        assert regular_price == regular_price_product
+        assert regular_price_text == regular_price_text_product
     except AssertionError:
         print("AssertionError: Обычная цена не совпадает")
 
     try:
-        assert sale_price == sale_price_product
+        assert sale_price_text == sale_price_text_product
     except AssertionError:
         print("AssertionError: Цена со скидкой не совпадает")
 
@@ -62,7 +73,8 @@ def test_page_and_product(driver):
         print("AssertionError: Цвет цены со скидкой не красная на странице товара")
 
     try:
-        assert re.findall(r'\d+', regular_price_style_product)[0] == re.findall(r'\d+', regular_price_style_product)[1] == re.findall(r'\d+', regular_price_style_product)[2]
+        assert re.findall(r'\d+', regular_price_style_product)[0] == re.findall(r'\d+', regular_price_style_product)[
+            1] == re.findall(r'\d+', regular_price_style_product)[2]
     except AssertionError:
         print("AssertionError: Цвет обычной цены не серый на странице товара")
 
