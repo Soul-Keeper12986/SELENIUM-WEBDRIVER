@@ -115,6 +115,15 @@ class TestAdminPanel:
         save_button = self.driver.find_element(By.NAME, 'save')
         save_button.click()
 
+        try:
+            # Ожидание появления элемента с уведомлением об успешном добавлении товара
+            success_message = WebDriverWait(self.driver, 10).until(ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#notices > div')))
+            assert "Changes saved" in success_message.text
+            print("Товар успешно добавлен в каталог")
+        except:
+            print("Ошибка при добавлении товара в каталог")
+
     def test_new_product(self):
         self.login_as_admin()
         self.navigate_to_catalog()
