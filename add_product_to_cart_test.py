@@ -22,11 +22,8 @@ class TestShoppingFlow:
         while int(cart_item_element.text) < 3:
             self.add_product_to_cart()
             cart_item_element = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content > span.quantity')
-            sleep(2)
-
         cart = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content')
         cart.click()
-        sleep(2)
 
     def add_product_to_cart(self):
         first_product = self.driver.find_element(By.CSS_SELECTOR, '#box-most-popular > div > ul > li:nth-child(1)')
