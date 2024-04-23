@@ -2,6 +2,7 @@ from time import sleep
 
 import pytest
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
@@ -24,6 +25,7 @@ class TestShoppingFlow:
             cart_item_element = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content > span.quantity')
         cart = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content')
         cart.click()
+        self.remove_all_products_from_cart()
 
     def add_product_to_cart(self):
         first_product = self.driver.find_element(By.CSS_SELECTOR, '#box-most-popular > div > ul > li:nth-child(1)')
@@ -54,14 +56,14 @@ class TestShoppingFlow:
             except:
                 break
 
-            if len(self.driver.find_elements(By.CSS_SELECTOR, '#checkout-cart-wrapper > p:nth-child(1) > em')) > 0:
-                break
-
-    def test_product(self):
-        self.test_shopping_flow()
-        self.remove_all_products_from_cart()
+        try:
+            empty_cart_message = self.driver.find_element(By.CSS_SELECTOR,
+                                                          '#checkout-cart-wrapper > p:nth-child(1) > em').text
+            self.driver.quit()
+            print(empty_cart_message)
+        except NoSuchElementException:
+            print("Empty cart message not found.")
 
 
 if __name__ == "__main__":
-    pytest.main(['-k', 'TestShoppingFlow.test_product'])
-
+    pytest.main(args=['-s', __file__])
