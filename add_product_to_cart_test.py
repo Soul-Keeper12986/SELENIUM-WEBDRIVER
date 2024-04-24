@@ -48,7 +48,9 @@ class TestShoppingFlow:
             if counter != 0:
                 WebDriverWait(self.driver, 10).until(EC.staleness_of(remove_button))  # Ждем исчезновения кнопки
                 WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'table.dataTable.rounded-corners')))
-            elif self.driver.find_element(By.CSS_SELECTOR, '#checkout-cart-wrapper > p:nth-child(1) > em').text == 'There are no items in your cart.'  :
+            elif WebDriverWait(self.driver, 10).until(
+                EC.text_to_be_present_in_element((By.CSS_SELECTOR, '#checkout-cart-wrapper > p:nth-child(1) > em'),
+                                                 'There are no items in your cart.')):
                 self.driver.quit()
 
 
