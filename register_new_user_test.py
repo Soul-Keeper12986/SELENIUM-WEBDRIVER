@@ -9,7 +9,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 @pytest.fixture
 def driver():
-    driver = webdriver.Firefox()
+    driver = webdriver.Chrome()
     driver.get("http://localhost/litecart/en/")
     yield driver
     driver.quit()
