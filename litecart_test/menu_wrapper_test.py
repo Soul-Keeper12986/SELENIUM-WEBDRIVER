@@ -27,7 +27,6 @@ def test_wrapper(driver, wait):
     login = driver.find_element(By.NAME, "login").click()
     menu_items = driver.find_elements(By.CSS_SELECTOR, "#box-apps-menu li#app-")
     print(menu_items)
-    sleep(10)
     for i in range(len(menu_items)):
         menu_items = driver.find_elements(By.CSS_SELECTOR, "#box-apps-menu li#app-")
         menu_items[i].click()
