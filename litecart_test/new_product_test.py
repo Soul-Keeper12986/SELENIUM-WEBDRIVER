@@ -59,12 +59,14 @@ class TestAdminPanel:
         quantity_input.clear()
         quantity_input.send_keys(randint(1, 5))
 
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "../images/1e6763690cba9156393df750092ee4d5.jpg")
+        phile_path = r'images\1e6763690cba9156393df750092ee4d5.jpg'
+        current_dir = os.path.join(os.getcwd(), phile_path)
+        need_dir = current_dir.replace("litecart_test\\", "")
+        print(need_dir)
         input_file = self.driver.find_element(By.XPATH,
                                               '//*[@id="tab-general"]/table/tbody/tr[9]/td/table/tbody/tr[1]/td/input')
+        input_file.send_keys(need_dir)
         sleep(2)
-        input_file.send_keys(file_path)
 
         date_valid_from_input = self.driver.find_element(By.NAME, 'date_valid_from')
         date_valid_from_input.send_keys('01010001')
@@ -121,12 +123,13 @@ class TestAdminPanel:
                 (By.CSS_SELECTOR, '#notices > div')))
             assert "Changes saved" in success_message.text
             print("Товар успешно добавлен в каталог")
-        except:
+        except Exception:
             print("Ошибка при добавлении товара в каталог")
 
     def test_new_product(self):
         self.login_as_admin()
         self.navigate_to_catalog()
+        sleep(3)
         self.add_new_product()
 
 
