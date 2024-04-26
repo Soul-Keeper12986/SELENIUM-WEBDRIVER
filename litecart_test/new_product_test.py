@@ -60,7 +60,7 @@ class TestAdminPanel:
         quantity_input.send_keys(randint(1, 5))
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "images\\1e6763690cba9156393df750092ee4d5.jpg")
+        file_path = os.path.join(current_dir, "../images/1e6763690cba9156393df750092ee4d5.jpg")
         input_file = self.driver.find_element(By.XPATH,
                                               '//*[@id="tab-general"]/table/tbody/tr[9]/td/table/tbody/tr[1]/td/input')
         sleep(2)
