@@ -17,6 +17,10 @@ class TestShoppingFlow:
         if self.driver:
             self.driver.quit()
 
+    def go_to_cart(self):
+        cart = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content')
+        cart.click()
+
     def add_product_to_cart(self):
         cart_item_element = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content > span.quantity')
         while int(cart_item_element.text) < self.PRODUCT_COUNT:
@@ -40,8 +44,7 @@ class TestShoppingFlow:
             cart_item_element = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content > span.quantity')
 
     def remove_products_from_cart(self):
-        cart = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content')
-        cart.click()
+        self.go_to_cart()
         ul_element = self.driver.find_element(By.CSS_SELECTOR, "#box-checkout-cart > ul")
         counter = int(len(ul_element.find_elements(By.TAG_NAME, "li")))
         while counter != 0:
