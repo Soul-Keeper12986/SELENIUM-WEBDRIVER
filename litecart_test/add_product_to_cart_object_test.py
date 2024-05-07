@@ -106,7 +106,6 @@ class TestShoppingFlow:
             self.main_page.select_first_product()
             self.product_page.add_to_cart()
             self.wait_for_cart_update()
-
         self.cart_page.open()
         self.remove_all_products()
 
