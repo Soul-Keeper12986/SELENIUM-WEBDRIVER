@@ -23,12 +23,19 @@ class ProductPage:
         self.driver = driver
 
     def add_to_cart(self):
-        if self.driver.find_element(By.CSS_SELECTOR,
-                                    '#box-product > div:nth-child(1) > h1').text == 'Yellow Duck':
-            size = self.driver.find_element(By.NAME, 'options[Size]')
-            Select(size).select_by_visible_text("Small")
-        add_to_cart = self.driver.find_element(By.NAME, 'add_cart_product')
-        add_to_cart.click()
+        if self.product_named('Yellow Duck'):
+            self.select_size('Small')
+        self.add_to_cart_button().click()
+
+    def product_named(self, name):
+        return self.driver.find_element(By.CSS_SELECTOR, '#box-product > div:nth-child(1) > h1').text == name
+
+    def select_size(self, size_name):
+        size = self.driver.find_element(By.NAME, 'options[Size]')
+        Select(size).select_by_visible_text(size_name)
+
+    def add_to_cart_button(self):
+        return self.driver.find_element(By.NAME, 'add_cart_product')
 
 
 class CartPage:
@@ -43,7 +50,7 @@ class CartPage:
         remove_button = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.NAME, 'remove_cart_item')))
         remove_button.click()
-        return remove_button  # Возвращаем кнопку после выполнения клика
+        return remove_button
 
 
 class TestShoppingFlow:
@@ -59,38 +66,49 @@ class TestShoppingFlow:
         if self.driver:
             self.driver.quit()
 
+    def cart_items_count(self):
+        cart_item_element = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content > span.quantity')
+        return int(cart_item_element.text)
+
+    def wait_for_cart_update(self):
+        original_cart_count = self.cart_items_count()
+        WebDriverWait(self.driver, 10).until(EC.text_to_be_present_in_element(
+            (By.CSS_SELECTOR, "#cart > a.content > span.quantity"), str(original_cart_count + 1)))
+        self.driver.back()
+
+    def cart_empty_message_visible(self):
+        return WebDriverWait(self.driver, 10).until(
+            EC.text_to_be_present_in_element((By.CSS_SELECTOR, '#checkout-cart-wrapper > p:nth-child(1) > em'),
+                                             'There are no items in your cart.'))
+
+    def table_cart_update(self):
+        return WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, 'table.dataTable.rounded-corners')))
+
+    def remove_all_products(self):
+        ul_element = self.driver.find_element(By.CSS_SELECTOR, "#box-checkout-cart > ul")
+        cart_items = ul_element.find_elements(By.TAG_NAME, "li")
+        counter = len(cart_items)
+        while counter != 0:
+            remove_button = self.cart_page.remove_product()
+            WebDriverWait(self.driver, 10).until(EC.staleness_of(remove_button))
+            counter -= 1
+            print(counter)
+            if counter != 0:
+                self.table_cart_update()
+            elif self.cart_empty_message_visible():
+                self.driver.quit()
+
     def test_shopping_flow(self):
         self.main_page.open()
 
-        cart_item_element = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content > span.quantity')
-        while int(cart_item_element.text) < self.PRODUCT_COUNT:
+        while self.cart_items_count() < self.PRODUCT_COUNT:
             self.main_page.select_first_product()
             self.product_page.add_to_cart()
-
-            original_cart_count = int(
-                self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content > span.quantity').text)
-
-            WebDriverWait(self.driver, 10).until(
-                EC.text_to_be_present_in_element((By.CSS_SELECTOR, "#cart > a.content > span.quantity"),
-                                                 str(original_cart_count + 1)))
-            self.driver.back()
-            cart_item_element = self.driver.find_element(By.CSS_SELECTOR, '#cart > a.content > span.quantity')
+            self.wait_for_cart_update()
 
         self.cart_page.open()
-
-        ul_element = self.driver.find_element(By.CSS_SELECTOR, "#box-checkout-cart > ul")
-        counter = int(len(ul_element.find_elements(By.TAG_NAME, "li")))
-        while counter != 0:
-            counter -= 1
-            remove_button = self.cart_page.remove_product()
-            WebDriverWait(self.driver, 10).until(EC.staleness_of(remove_button))  # Ждем исчезновения кнопки
-            if counter != 0:
-                WebDriverWait(self.driver, 10).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, 'table.dataTable.rounded-corners')))
-            elif WebDriverWait(self.driver, 10).until(
-                    EC.text_to_be_present_in_element((By.CSS_SELECTOR, '#checkout-cart-wrapper > p:nth-child(1) > em'),
-                                                     'There are no items in your cart.')):
-                self.driver.quit()
+        self.remove_all_products()
 
 
 if __name__ == "__main__":
