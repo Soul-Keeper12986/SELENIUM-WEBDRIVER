@@ -97,7 +97,7 @@ class TestShoppingFlow:
             if counter != 0:
                 self.table_cart_update()
             elif self.cart_empty_message_visible():
-                self.driver.quit()
+                self.teardown_method()
 
     def test_shopping_flow(self):
         self.main_page.open()
